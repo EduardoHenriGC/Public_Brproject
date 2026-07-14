@@ -82,6 +82,24 @@ public class Frintezza extends DefaultNpc
 		29045
 	};
 	
+	private boolean isEventSpawn(Npc npc)
+	{
+		return npc.getSpawn().getSpawnData() == null;
+	}
+	
+	private int getDBValue(Npc npc)
+	{
+		if (npc.getSpawn().getSpawnData() != null)
+			return npc.getSpawn().getSpawnData().getDBValue();
+		return 7;
+	}
+	
+	private void setDBValue(Npc npc, int value)
+	{
+		if (npc.getSpawn().getSpawnData() != null)
+			npc.getSpawn().getSpawnData().setDBValue(value);
+	}
+	
 	@Override
 	public void onCreated(Npc npc)
 	{
@@ -91,9 +109,14 @@ public class Frintezza extends DefaultNpc
 		if (c0 == null)
 			GlobalMemo.getInstance().set(String.valueOf(GM_ID), npc.getObjectId());
 		
-		if (!npc.getSpawn().getDBLoaded())
+		if (isEventSpawn(npc))
 		{
-			npc.getSpawn().getSpawnData().setDBValue(0);
+			startQuestTimer("3000", npc, null, 1000);
+			npc._i_ai0 = 7;
+		}
+		else if (!npc.getSpawn().getDBLoaded())
+		{
+			setDBValue(npc, 0);
 			
 			final NpcMaker maker0 = SpawnManager.getInstance().getNpcMaker("frintessa_2515_m01");
 			if (maker0 != null)
@@ -130,13 +153,13 @@ public class Frintezza extends DefaultNpc
 			if (c1 != null)
 				c1.sendScriptEvent(npc.getObjectId(), 0, 0);
 		}
-		else if (npc.getSpawn().getSpawnData().getDBValue() == 1)
+		else if (getDBValue(npc) == 1)
 		{
 			final NpcMaker maker0 = SpawnManager.getInstance().getNpcMaker("frintessa_2515_m01");
 			if (maker0 != null)
 				maker0.getMaker().onMakerScriptEvent("1001", maker0, 0, 0);
 		}
-		else if (npc.getSpawn().getSpawnData().getDBValue() == 2)
+		else if (getDBValue(npc) == 2)
 		{
 			startQuestTimer("1001", npc, null, 600000);
 			
@@ -144,7 +167,7 @@ public class Frintezza extends DefaultNpc
 			if (maker0 != null)
 				maker0.getMaker().onMakerScriptEvent("1000", maker0, 0, 0);
 		}
-		else if (npc.getSpawn().getSpawnData().getDBValue() > 2 && npc.getSpawn().getSpawnData().getDBValue() < 8)
+		else if (getDBValue(npc) > 2 && getDBValue(npc) < 8)
 		{
 			openCloseDoor(T_DOOR_NAME_1, 1);
 			openCloseDoor(T_DOOR_NAME_2, 1);
@@ -171,20 +194,20 @@ public class Frintezza extends DefaultNpc
 			
 			createOnePrivateEx(npc, 29052, 174239, -89809, -5016, 16384, 0, false);
 			
-			if (npc.getSpawn().getSpawnData().getDBValue() == 3)
+			if (getDBValue(npc) == 3)
 				frintezzaPlaySong(npc, 0, 0, 0, 0, 0);
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 4)
+			else if (getDBValue(npc) == 4)
 				frintezzaPlaySong(npc, 0, 0, 0, 0, 0);
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 5)
+			else if (getDBValue(npc) == 5)
 				frintezzaPlaySong(npc, 2000, 2000, 0, 0, 0);
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 6)
+			else if (getDBValue(npc) == 6)
 			{
 				if (i_ai1 == 0)
 					frintezzaPlaySong(npc, 1500, 1500, 1000, 2000, 0);
 				else if (i_ai1 == 30010)
 					frintezzaPlaySong(npc, 1000, 2000, 1000, 2000, 0);
 			}
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 7)
+			else if (getDBValue(npc) == 7)
 			{
 				if (i_ai1 == 0)
 					frintezzaPlaySong(npc, 0, 1500, 625, 2500, 0);
@@ -310,20 +333,20 @@ public class Frintezza extends DefaultNpc
 		{
 			npc._i_quest1 = GameTimeTaskManager.getInstance().getCurrentTick();
 			
-			if (npc.getSpawn().getSpawnData().getDBValue() == 3)
+			if (getDBValue(npc) == 3)
 				frintezzaPlaySong(npc, 0, 0, 0, 0, 0);
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 4)
+			else if (getDBValue(npc) == 4)
 				frintezzaPlaySong(npc, 0, 0, 0, 0, 0);
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 5)
+			else if (getDBValue(npc) == 5)
 				frintezzaPlaySong(npc, 2000, 2000, 0, 0, 0);
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 6)
+			else if (getDBValue(npc) == 6)
 			{
 				if (i_ai1 == 0)
 					frintezzaPlaySong(npc, 1500, 1500, 1000, 2000, 0);
 				else if (i_ai1 == 30010)
 					frintezzaPlaySong(npc, 1000, 2000, 1000, 2000, 0);
 			}
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 7)
+			else if (getDBValue(npc) == 7)
 			{
 				if (i_ai1 == 0)
 					frintezzaPlaySong(npc, 0, 1500, 625, 2500, 0);
@@ -358,7 +381,7 @@ public class Frintezza extends DefaultNpc
 			{
 				c0.sendScriptEvent(npc.getObjectId(), 4, 0);
 				
-				npc.getSpawn().getSpawnData().setDBValue(4);
+				setDBValue(npc, 4);
 			}
 			
 			startQuestTimer("1012", npc, null, 1000);
@@ -367,20 +390,20 @@ public class Frintezza extends DefaultNpc
 		{
 			npc._i_quest1 = GameTimeTaskManager.getInstance().getCurrentTick();
 			
-			if (npc.getSpawn().getSpawnData().getDBValue() == 3)
+			if (getDBValue(npc) == 3)
 				frintezzaPlaySong(npc, 0, 0, 0, 0, 0);
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 4)
+			else if (getDBValue(npc) == 4)
 				frintezzaPlaySong(npc, 0, 0, 0, 0, 0);
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 5)
+			else if (getDBValue(npc) == 5)
 				frintezzaPlaySong(npc, 2000, 2000, 0, 0, 0);
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 6)
+			else if (getDBValue(npc) == 6)
 			{
 				if (i_ai1 == 0)
 					frintezzaPlaySong(npc, 1500, 1500, 1000, 2000, 0);
 				else if (i_ai1 == 30010)
 					frintezzaPlaySong(npc, 1000, 2000, 1000, 2000, 0);
 			}
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 7)
+			else if (getDBValue(npc) == 7)
 			{
 				if (i_ai1 == 0)
 					frintezzaPlaySong(npc, 0, 1500, 625, 2500, 0);
@@ -442,7 +465,7 @@ public class Frintezza extends DefaultNpc
 			npc.doDie(npc);
 		else if (name.equalsIgnoreCase("8000"))
 		{
-			npc.getSpawn().getSpawnData().setDBValue(0);
+			setDBValue(npc, 0);
 			
 			npc.getPosition().setHeading(16384);
 			npc.teleportTo(-105200, -253104, -15264, 0);
@@ -478,20 +501,20 @@ public class Frintezza extends DefaultNpc
 		{
 			npc._i_ai4 = 0;
 			
-			if (npc.getSpawn().getSpawnData().getDBValue() == 3)
+			if (getDBValue(npc) == 3)
 				frintezzaPlaySong(npc, 0, 0, 0, 0, 0);
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 4)
+			else if (getDBValue(npc) == 4)
 				frintezzaPlaySong(npc, 0, 0, 0, 0, 0);
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 5)
+			else if (getDBValue(npc) == 5)
 				frintezzaPlaySong(npc, 2, 2000, 0, 0, 0);
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 6)
+			else if (getDBValue(npc) == 6)
 			{
 				if (i_ai1 == 0)
 					frintezzaPlaySong(npc, 1, 1500, 1000, 2000, 0);
 				else if (i_ai1 == 30010)
 					frintezzaPlaySong(npc, 1, 2000, 1000, 2000, 0);
 			}
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 7)
+			else if (getDBValue(npc) == 7)
 			{
 				if (i_ai1 == 0)
 					frintezzaPlaySong(npc, 0, 1500, 625, 2500, 0);
@@ -519,20 +542,20 @@ public class Frintezza extends DefaultNpc
 		{
 			npc._i_ai4 = 0;
 			
-			if (npc.getSpawn().getSpawnData().getDBValue() == 3)
+			if (getDBValue(npc) == 3)
 				frintezzaPlaySong(npc, 0, 0, 0, 0, 0);
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 4)
+			else if (getDBValue(npc) == 4)
 				frintezzaPlaySong(npc, 0, 0, 0, 0, 0);
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 5)
+			else if (getDBValue(npc) == 5)
 				frintezzaPlaySong(npc, 2, 2000, 0, 0, 0);
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 6)
+			else if (getDBValue(npc) == 6)
 			{
 				if (i_ai1 == 0)
 					frintezzaPlaySong(npc, 1, 1500, 1000, 2000, 0);
 				else if (i_ai1 == 30010)
 					frintezzaPlaySong(npc, 1, 2000, 1000, 2000, 0);
 			}
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 7)
+			else if (getDBValue(npc) == 7)
 			{
 				if (i_ai1 == 0)
 					frintezzaPlaySong(npc, 0, 1500, 625, 2500, 0);
@@ -571,7 +594,7 @@ public class Frintezza extends DefaultNpc
 		{
 			if (arg1 == 5)
 			{
-				npc.getSpawn().getSpawnData().setDBValue(5);
+				setDBValue(npc, 5);
 				
 				npc._i_ai0 = 5;
 				npc._i_ai1 = 0;
@@ -580,7 +603,7 @@ public class Frintezza extends DefaultNpc
 				npc._i_ai1 = 30000;
 			else if (arg1 == 6)
 			{
-				npc.getSpawn().getSpawnData().setDBValue(6);
+				setDBValue(npc, 6);
 				
 				npc._i_ai0 = 6;
 				npc._i_ai1 = 0;
@@ -590,7 +613,7 @@ public class Frintezza extends DefaultNpc
 		}
 		else if (arg1 == 7)
 		{
-			npc.getSpawn().getSpawnData().setDBValue(7);
+			setDBValue(npc, 7);
 			
 			npc._i_ai0 = 7;
 			npc._i_ai1 = 0;
@@ -634,7 +657,7 @@ public class Frintezza extends DefaultNpc
 			openCloseDoor(WALL_DOOR_NAME_10B, 1);
 			
 			
-			npc.getSpawn().getSpawnData().setDBValue(0);
+			setDBValue(npc, 0);
 			
 			npc.getPosition().setHeading(16384);
 			npc.teleportTo(-105200, -253104, -15264, 0);
@@ -646,7 +669,7 @@ public class Frintezza extends DefaultNpc
 		}
 		else if (arg1 == 1)
 		{
-			npc.getSpawn().getSpawnData().setDBValue(1);
+			setDBValue(npc, 1);
 			
 			c0 = (Npc) GlobalMemo.getInstance().getCreature("5");
 			if (c0 != null)
@@ -654,7 +677,7 @@ public class Frintezza extends DefaultNpc
 		}
 		else if (arg1 == 2)
 		{
-			npc.getSpawn().getSpawnData().setDBValue(2);
+			setDBValue(npc, 2);
 			
 			c0 = (Npc) GlobalMemo.getInstance().getCreature("5");
 			if (c0 != null)
@@ -668,7 +691,7 @@ public class Frintezza extends DefaultNpc
 		}
 		else if (arg1 == 3)
 		{
-			npc.getSpawn().getSpawnData().setDBValue(3);
+			setDBValue(npc, 3);
 			
 			startQuestTimer("1000", npc, null, 4000);
 		}
@@ -712,20 +735,20 @@ public class Frintezza extends DefaultNpc
 				int i_ai1 = npc._i_ai1;
 				
 				
-				if (npc.getSpawn().getSpawnData().getDBValue() == 3)
+				if (getDBValue(npc) == 3)
 					frintezzaPlaySong(npc, 0, 0, 0, 0, 0);
-				else if (npc.getSpawn().getSpawnData().getDBValue() == 4)
+				else if (getDBValue(npc) == 4)
 					frintezzaPlaySong(npc, 0, 0, 0, 0, 0);
-				else if (npc.getSpawn().getSpawnData().getDBValue() == 5)
+				else if (getDBValue(npc) == 5)
 					frintezzaPlaySong(npc, 2, 2000, 0, 0, 0);
-				else if (npc.getSpawn().getSpawnData().getDBValue() == 6)
+				else if (getDBValue(npc) == 6)
 				{
 					if (i_ai1 == 0)
 						frintezzaPlaySong(npc, 1, 1500, 1000, 2000, 0);
 					else if (i_ai1 == 30010)
 						frintezzaPlaySong(npc, 1, 2000, 1000, 2000, 0);
 				}
-				else if (npc.getSpawn().getSpawnData().getDBValue() == 7)
+				else if (getDBValue(npc) == 7)
 				{
 					if (i_ai1 == 0)
 						frintezzaPlaySong(npc, 0, 1500, 625, 2500, 0);
@@ -758,15 +781,14 @@ public class Frintezza extends DefaultNpc
 		}
 	}
 	
-	@Override
-	public void onMyDying(Npc npc, Creature killer)
+	@Override	public void onMyDying(Npc npc, Creature killer)
 	{
 		GlobalMemo.getInstance().remove(String.valueOf(GM_ID));
 		
 		openCloseDoor(T_DOOR_NAME_1, 1);
 		openCloseDoor(T_DOOR_NAME_2, 1);
-		openCloseDoor(T_DOOR_NAME_3, 0);
-		openCloseDoor(T_DOOR_NAME_4, 0);
+		openCloseDoor(T_DOOR_NAME_3, 1);
+		openCloseDoor(T_DOOR_NAME_4, 1);
 		openCloseDoor(WALL_DOOR_NAME_1A, 1);
 		openCloseDoor(WALL_DOOR_NAME_2A, 1);
 		openCloseDoor(WALL_DOOR_NAME_3A, 1);
@@ -786,11 +808,13 @@ public class Frintezza extends DefaultNpc
 		openCloseDoor(WALL_DOOR_NAME_9B, 1);
 		openCloseDoor(WALL_DOOR_NAME_10B, 1);
 		
-		npc.getSpawn().getSpawnData().setDBValue(0);
+		setDBValue(npc, 0);
 		
 		final NpcMaker maker0 = SpawnManager.getInstance().getNpcMaker("frintessa_teleportcuve");
 		if (maker0 != null)
 			maker0.getMaker().onMakerScriptEvent("1001", maker0, 0, 0);
+			
+		npc.deleteMe();
 	}
 	
 	@Override
@@ -798,25 +822,25 @@ public class Frintezza extends DefaultNpc
 	{
 		int i_ai1 = npc._i_ai1;
 		
-		if (npc.getSpawn().getSpawnData().getDBValue() < 4)
+		if (getDBValue(npc) < 4)
 			return;
 		
 		if (npc._i_ai4 == 0)
 		{
-			if (npc.getSpawn().getSpawnData().getDBValue() == 3)
+			if (getDBValue(npc) == 3)
 				frintezzaPlaySong(npc, 0, 0, 0, 0, 0);
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 4)
+			else if (getDBValue(npc) == 4)
 				frintezzaPlaySong(npc, 0, 0, 0, 0, 0);
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 5)
+			else if (getDBValue(npc) == 5)
 				frintezzaPlaySong(npc, 2, 2000, 0, 0, 0);
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 6)
+			else if (getDBValue(npc) == 6)
 			{
 				if (i_ai1 == 0)
 					frintezzaPlaySong(npc, 1, 1500, 1000, 2000, 0);
 				else if (i_ai1 == 30010)
 					frintezzaPlaySong(npc, 1, 2000, 1000, 2000, 0);
 			}
-			else if (npc.getSpawn().getSpawnData().getDBValue() == 7)
+			else if (getDBValue(npc) == 7)
 			{
 				if (i_ai1 == 0)
 					frintezzaPlaySong(npc, 0, 1500, 625, 2500, 0);

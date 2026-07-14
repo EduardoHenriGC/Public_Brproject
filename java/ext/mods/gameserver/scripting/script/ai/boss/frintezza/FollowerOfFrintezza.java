@@ -28,7 +28,6 @@ import ext.mods.gameserver.model.actor.Player;
 import ext.mods.gameserver.model.location.Location;
 import ext.mods.gameserver.model.memo.GlobalMemo;
 import ext.mods.gameserver.model.spawn.NpcMaker;
-import ext.mods.gameserver.network.serverpackets.SpecialCamera;
 import ext.mods.gameserver.scripting.script.ai.individual.DefaultNpc;
 import ext.mods.gameserver.skills.L2Skill;
 import ext.mods.gameserver.taskmanager.GameTimeTaskManager;
@@ -57,6 +56,19 @@ public class FollowerOfFrintezza extends DefaultNpc
 		super(descr);
 	}
 	
+	private int getDBValue(Npc npc)
+	{
+		if (npc.getSpawn().getSpawnData() != null)
+			return npc.getSpawn().getSpawnData().getDBValue();
+		return 7;
+	}
+	
+	private void setDBValue(Npc npc, int value)
+	{
+		if (npc.getSpawn().getSpawnData() != null)
+			npc.getSpawn().getSpawnData().setDBValue(value);
+	}
+	
 	protected final int[] _npcIds =
 	{
 		29046
@@ -71,7 +83,7 @@ public class FollowerOfFrintezza extends DefaultNpc
 		
 		if (!npc.getSpawn().getDBLoaded())
 		{
-			npc.getSpawn().getSpawnData().setDBValue(0);
+			setDBValue(npc, 0);
 			
 			Npc c1 = (Npc) GlobalMemo.getInstance().getCreature("4");
 			if (c1 != null)
@@ -81,7 +93,7 @@ public class FollowerOfFrintezza extends DefaultNpc
 			if (c1 != null)
 				c1.sendScriptEvent(npc.getObjectId(), 0, 0);
 		}
-		else if (npc.getSpawn().getSpawnData().getDBValue() == 5)
+		else if (getDBValue(npc) == 5)
 		{
 			NpcMaker nm = SpawnManager.getInstance().getNpcMaker("frintessa_evilate_maker1");
 			if (nm != null)
@@ -93,7 +105,7 @@ public class FollowerOfFrintezza extends DefaultNpc
 			
 			startQuestTimer("3000", npc, null, 1000);
 		}
-		else if (npc.getSpawn().getSpawnData().getDBValue() == 6)
+		else if (getDBValue(npc) == 6)
 		{
 			NpcMaker nm = SpawnManager.getInstance().getNpcMaker("frintessa_evilate_maker1");
 			if (nm != null)
@@ -112,7 +124,7 @@ public class FollowerOfFrintezza extends DefaultNpc
 			
 			npc.getAI().addCastDesire(npc, CHANGE_BODY_SKILL, 1000000);
 			
-			npc.getSpawn().getSpawnData().setDBValue(6);
+			setDBValue(npc, 6);
 			
 			c0 = (Npc) GlobalMemo.getInstance().getCreature("4");
 			if (c0 != null)
@@ -141,7 +153,7 @@ public class FollowerOfFrintezza extends DefaultNpc
 		npc._i_quest0 = 0;
 		npc._i_quest1 = GameTimeTaskManager.getInstance().getCurrentTick();
 		
-		if (npc.getSpawn().getSpawnData().getDBValue() == 5 || npc.getSpawn().getSpawnData().getDBValue() == 6)
+		if (getDBValue(npc) == 5 || getDBValue(npc) == 6)
 		{
 			npc.getAI().addWanderDesire(5, 5);
 			
@@ -167,7 +179,7 @@ public class FollowerOfFrintezza extends DefaultNpc
 		
 		final double hpRatio = npc.getStatus().getHpRatio();
 		
-		if (npc.getSpawn().getSpawnData().getDBValue() == 5 && hpRatio < 0.6)
+		if (getDBValue(npc) == 5 && hpRatio < 0.6)
 		{
 			npc.removeAllDesire();
 			
@@ -178,7 +190,7 @@ public class FollowerOfFrintezza extends DefaultNpc
 			
 			npc.getAI().addCastDesire(npc, CHANGE_BODY_SKILL, 1000000);
 			
-			npc.getSpawn().getSpawnData().setDBValue(6);
+			setDBValue(npc, 6);
 			
 			final Npc c0 = (Npc) GlobalMemo.getInstance().getCreature("4");
 			if (c0 != null)
@@ -188,7 +200,7 @@ public class FollowerOfFrintezza extends DefaultNpc
 			
 			startQuestTimer("4000", npc, null, 2000);
 		}
-		else if (npc.getSpawn().getSpawnData().getDBValue() == 6 && hpRatio < 0.5 && npc._i_ai3 == 6)
+		else if (getDBValue(npc) == 6 && hpRatio < 0.5 && npc._i_ai3 == 6)
 		{
 			final Npc c0 = (Npc) GlobalMemo.getInstance().getCreature("4");
 			if (c0 != null)
@@ -196,9 +208,9 @@ public class FollowerOfFrintezza extends DefaultNpc
 			
 			npc._i_ai3 = 30010;
 		}
-		else if (npc.getSpawn().getSpawnData().getDBValue() == 6 && hpRatio <= 0.2 && npc._i_ai3 == 30010 && npc._i_ai4 == 0)
+		else if (getDBValue(npc) == 6 && hpRatio <= 0.2 && npc._i_ai3 == 30010 && npc._i_ai4 == 0)
 		{
-			npc.getSpawn().getSpawnData().setDBValue(50000);
+			setDBValue(npc, 50000);
 			npc._i_ai3 = 30011;
 			
 			broadcastScriptEvent(npc, 0, 50000, 6000);
@@ -287,19 +299,19 @@ public class FollowerOfFrintezza extends DefaultNpc
 			if (maker0 != null)
 				maker0.getMaker().onMakerScriptEvent("1001", maker0, 0, 0);
 			
-			if (npc.getSpawn().getSpawnData().getDBValue() == 6)
+			if (getDBValue(npc) == 6)
 				npc._i_ai2 = 1;
 		}
 		
 		final IntentionType currentIntentionType = npc.getAI().getCurrentIntention().getType();
 		
-		if ((npc.getSpawn().getSpawnData().getDBValue() == 5 || npc.getSpawn().getSpawnData().getDBValue() == 6) && (currentIntentionType == IntentionType.IDLE || currentIntentionType == IntentionType.WANDER))
+		if ((getDBValue(npc) == 5 || getDBValue(npc) == 6) && (currentIntentionType == IntentionType.IDLE || currentIntentionType == IntentionType.WANDER))
 			doAttack(npc);
 		
 		super.onAttacked(npc, attacker, damage, skill);
 	}
 	
-	
+
 	@Override
 	public void onSpelled(Npc npc, Player caster, L2Skill skill)
 	{
@@ -313,7 +325,7 @@ public class FollowerOfFrintezza extends DefaultNpc
 			if (maker0 != null)
 				maker0.getMaker().onMakerScriptEvent("1001", maker0, 0, 0);
 			
-			if (npc.getSpawn().getSpawnData().getDBValue() == 6)
+			if (getDBValue(npc) == 6)
 			{
 				npc._i_ai2 = 1;
 				
@@ -327,7 +339,7 @@ public class FollowerOfFrintezza extends DefaultNpc
 	{
 		if (arg1 == 4)
 		{
-			npc.getSpawn().getSpawnData().setDBValue(4);
+			setDBValue(npc, 4);
 			
 			npc._i_quest1 = GameTimeTaskManager.getInstance().getCurrentTick();
 			
@@ -337,7 +349,7 @@ public class FollowerOfFrintezza extends DefaultNpc
 		}
 		else if (arg1 == 0)
 		{
-			npc.getSpawn().getSpawnData().setDBValue(0);
+			setDBValue(npc, 0);
 			npc.removeAllDesire();
 			
 			npc._i_quest2 = 0;
@@ -368,7 +380,7 @@ public class FollowerOfFrintezza extends DefaultNpc
 			startQuestTimer("1900", npc, null, 10000);
 		else if (name.equalsIgnoreCase("1900"))
 		{
-			npc.getSpawn().getSpawnData().setDBValue(5);
+			setDBValue(npc, 5);
 			
 			npc._i_ai4 = 0;
 			
@@ -399,14 +411,10 @@ public class FollowerOfFrintezza extends DefaultNpc
 		}
 		else if (name.equalsIgnoreCase("2005"))
 		{
-			npc.broadcastPacket(new SpecialCamera(npc.getObjectId(), 250, 180, 20, 0, 10000, 0, 6, 1, 1));
-			
 			startQuestTimer("2006", npc, null, 100);
 		}
 		else if (name.equalsIgnoreCase("2006"))
 		{
-			npc.broadcastPacket(new SpecialCamera(npc.getObjectId(), 250, 180, 20, 0, 10000, 0, 6, 1, 1));
-			
 			startQuestTimer("2100", npc, null, 400);
 		}
 		else if (name.equalsIgnoreCase("2100"))
@@ -428,43 +436,36 @@ public class FollowerOfFrintezza extends DefaultNpc
 		}
 		else if (name.equalsIgnoreCase("2102"))
 		{
-			npc.broadcastPacket(new SpecialCamera(npc.getObjectId(), 250, 180, 20, 0, 10000, 0, 6, 1, 1));
 			
 			startQuestTimer("2103", npc, null, 100);
 		}
 		else if (name.equalsIgnoreCase("2103"))
 		{
-			npc.broadcastPacket(new SpecialCamera(npc.getObjectId(), 250, 180, 20, 0, 10000, 0, 6, 1, 1));
 			
 			startQuestTimer("2104", npc, null, 400);
 		}
 		else if (name.equalsIgnoreCase("2104"))
 		{
-			npc.broadcastPacket(new SpecialCamera(npc.getObjectId(), 300, 220, 0, 3000, 10000, 0, 0, 1, 1));
 			
 			startQuestTimer("2105", npc, null, 3000);
 		}
 		else if (name.equalsIgnoreCase("2105"))
 		{
-			npc.broadcastPacket(new SpecialCamera(npc.getObjectId(), 100, 150, -3, 0, 10000, 0, 0, 1, 1));
 			
 			startQuestTimer("2106", npc, null, 100);
 		}
 		else if (name.equalsIgnoreCase("2106"))
 		{
-			npc.broadcastPacket(new SpecialCamera(npc.getObjectId(), 100, 150, -3, 0, 10000, 0, 0, 1, 1));
 			
 			startQuestTimer("2107", npc, null, 400);
 		}
 		else if (name.equalsIgnoreCase("2107"))
 		{
-			npc.broadcastPacket(new SpecialCamera(npc.getObjectId(), 100, 150, 10, 3000, 5000, 0, 15, 1, 1));
 			
 			startQuestTimer("2108", npc, null, 4000);
 		}
 		else if (name.equalsIgnoreCase("2108"))
 		{
-			npc.broadcastPacket(new SpecialCamera(npc.getObjectId(), 300, 180, 10, 2000, 2000, 0, 5, 1, 1));
 			
 			startQuestTimer("2109", npc, null, 2000);
 		}
@@ -472,16 +473,16 @@ public class FollowerOfFrintezza extends DefaultNpc
 		{
 			GlobalMemo.getInstance().remove(String.valueOf(GM_ID));
 			
-			npc.getSpawn().getSpawnData().setDBValue(0);
+			setDBValue(npc, 0);
 			npc.deleteMe();
 		}
 		else if (name.equalsIgnoreCase("3000"))
 		{
-			if (npc.getSpawn().getSpawnData().getDBValue() == 5 || npc.getSpawn().getSpawnData().getDBValue() == 6)
+			if (getDBValue(npc) == 5 || getDBValue(npc) == 6)
 			{
 				if (getElapsedTicks(npc._i_quest1) > (15 * 60))
 				{
-					npc.getSpawn().getSpawnData().setDBValue(0);
+					setDBValue(npc, 0);
 					
 					Npc c0 = (Npc) GlobalMemo.getInstance().getCreature("4");
 					if (c0 != null)
@@ -538,7 +539,7 @@ public class FollowerOfFrintezza extends DefaultNpc
 		{
 			IntentionType currentIntentionType = npc.getAI().getCurrentIntention().getType();
 			
-			if ((npc.getSpawn().getSpawnData().getDBValue() == 5 || npc.getSpawn().getSpawnData().getDBValue() == 6) && (currentIntentionType == IntentionType.IDLE || currentIntentionType == IntentionType.WANDER))
+			if ((getDBValue(npc) == 5 || getDBValue(npc) == 6) && (currentIntentionType == IntentionType.IDLE || currentIntentionType == IntentionType.WANDER))
 				doAttack(npc);
 			
 			startQuestTimer("3001", npc, null, 60000);
@@ -555,7 +556,7 @@ public class FollowerOfFrintezza extends DefaultNpc
 		if (npc._i_ai4 == 1)
 			return;
 		
-		final int dbValue = npc.getSpawn().getSpawnData().getDBValue();
+		final int dbValue = getDBValue(npc);
 		
 		if (creature.getActingPlayer() == null)
 		{
@@ -655,7 +656,7 @@ public class FollowerOfFrintezza extends DefaultNpc
 		
 		GlobalMemo.getInstance().remove(String.valueOf(GM_ID));
 		
-		npc.getSpawn().getSpawnData().setDBValue(0);
+		setDBValue(npc, 0);
 		
 		startQuestTimer("2000", npc, null, 500);
 	}
@@ -663,14 +664,14 @@ public class FollowerOfFrintezza extends DefaultNpc
 	@Override
 	public void onNoDesire(Npc npc)
 	{
-		final int dbValue = npc.getSpawn().getSpawnData().getDBValue();
+		final int dbValue = getDBValue(npc);
 		if ((dbValue == 5 || dbValue == 6) && npc._i_ai4 == 0)
 			npc.lookNeighbor(2000);
 		else if (dbValue == 0)
 			npc.removeAllDesire();
 	}
 	
-	private static void doAttack(Npc npc)
+	private void doAttack(Npc npc)
 	{
 		int i1 = 0;
 		int i2 = 0;
@@ -727,7 +728,7 @@ public class FollowerOfFrintezza extends DefaultNpc
 			
 			if (c2 != null)
 			{
-				if (npc.getSpawn().getSpawnData().getDBValue() == 5)
+				if (getDBValue(npc) == 5)
 				{
 					if (Rnd.get(10000) < 2000)
 					{
@@ -737,7 +738,7 @@ public class FollowerOfFrintezza extends DefaultNpc
 					else
 						npc.getAI().addCastDesire(c2, SWING_VER_1, 10000, false);
 				}
-				else if (npc.getSpawn().getSpawnData().getDBValue() == 6)
+				else if (getDBValue(npc) == 6)
 				{
 					if (npc._i_ai2 > 0)
 					{
