@@ -42,6 +42,16 @@ public class Antharas extends DefaultNpc
 		super("ai/boss/antharas");
 	}
 	
+	private boolean isFighting(Npc npc)
+	{
+		return npc.getSpawn().getSpawnData() == null || npc.getSpawn().getSpawnData().getDBValue() == 3;
+	}
+	
+	private boolean isSleeping(Npc npc)
+	{
+		return npc.getSpawn().getSpawnData() != null && npc.getSpawn().getSpawnData().getDBValue() == 0;
+	}
+	
 	public Antharas(String descr)
 	{
 		super(descr);
@@ -61,7 +71,7 @@ public class Antharas extends DefaultNpc
 		
 		startQuestTimerAtFixedRate("2001", npc, null, 2 * 60 * 1000L, 2 * 60 * 1000L);
 		
-		if (!npc.getSpawn().getDBLoaded())
+		if (!npc.getSpawn().getDBLoaded() && npc.getSpawn().getSpawnData() != null)
 		{
 			npc.getSpawn().getSpawnData().setDBValue(0);
 			npc.broadcastPacket(new Earthquake(npc, 20, 10, true));
@@ -80,7 +90,7 @@ public class Antharas extends DefaultNpc
 				GlobalMemo.getInstance().set(String.valueOf(GM_ID), npc.getObjectId());
 		}
 		
-		final int dbValue = npc.getSpawn().getSpawnData().getDBValue();
+		final int dbValue = npc.getSpawn().getSpawnData() != null ? npc.getSpawn().getSpawnData().getDBValue() : 3;
 		if (dbValue == 1)
 			startQuestTimer("1001", npc, null, 10 * 60 * 1000L);
 		else if (dbValue == 2)
@@ -101,17 +111,16 @@ public class Antharas extends DefaultNpc
 	@Override
 	public void onNoDesire(Npc npc)
 	{
-		final int dbValue = npc.getSpawn().getSpawnData().getDBValue();
-		if (dbValue == 3)
+		if (isFighting(npc))
 			npc.getAI().addWanderDesire(5, 5);
-		else if (dbValue == 0)
+		else if (isSleeping(npc))
 			npc.removeAllDesire();
 	}
 	
 	@Override
 	public void onScriptEvent(Npc npc, int eventId, int arg1, int arg2)
 	{
-		if (npc.getSpawn().getSpawnData().getDBValue() == 0)
+		if (isSleeping(npc))
 		{
 			startQuestTimer("1001", npc, null, 10 * 1000L);
 			
@@ -240,7 +249,7 @@ public class Antharas extends DefaultNpc
 			
 			IntentionType currentIntentionType = npc.getAI().getCurrentIntention().getType();
 			
-			if (npc.getSpawn().getSpawnData().getDBValue() == 3 && (currentIntentionType == IntentionType.IDLE || currentIntentionType == IntentionType.WANDER))
+			if (isFighting(npc) && (currentIntentionType == IntentionType.IDLE || currentIntentionType == IntentionType.WANDER))
 				castAntharasSkill(npc);
 		}
 		
@@ -252,7 +261,7 @@ public class Antharas extends DefaultNpc
 	{
 		int i1 = 0;
 		
-		if (npc.getSpawn().getSpawnData().getDBValue() == 0 && !npc.isDead())
+		if (isSleeping(npc) && !npc.isDead())
 			npc.getSpawn().instantTeleportInMyTerritory(80464, 152294, -3534, 100);
 		
 		npc._i_ai1 = GameTimeTaskManager.getInstance().getCurrentTick();
@@ -566,7 +575,7 @@ public class Antharas extends DefaultNpc
 		
 		IntentionType currentIntention = npc.getAI().getCurrentIntention().getType();
 		
-		if (npc.getSpawn().getSpawnData().getDBValue() == 3 && (currentIntention == IntentionType.WANDER || currentIntention == IntentionType.IDLE))
+		if (isFighting(npc) && (currentIntention == IntentionType.WANDER || currentIntention == IntentionType.IDLE))
 			castAntharasSkill(npc);
 	}
 	
@@ -575,7 +584,7 @@ public class Antharas extends DefaultNpc
 	{
 		int i1 = 0;
 		
-		if (creature instanceof Player player && npc.getSpawn().getSpawnData().getDBValue() == 3 && ClassId.isSameOccupation(player, "@cleric_group"))
+		if (creature instanceof Player player && isFighting(npc) && ClassId.isSameOccupation(player, "@cleric_group"))
 		{
 			final double hpRatio = npc.getStatus().getHpRatio();
 			if (hpRatio < 0.25)
@@ -881,7 +890,7 @@ public class Antharas extends DefaultNpc
 		
 		final IntentionType currentIntention = npc.getAI().getCurrentIntention().getType();
 		
-		if (npc.getSpawn().getSpawnData().getDBValue() == 3 && (currentIntention == IntentionType.WANDER || currentIntention == IntentionType.IDLE))
+		if (isFighting(npc) && (currentIntention == IntentionType.WANDER || currentIntention == IntentionType.IDLE))
 			castAntharasSkill(npc);
 	}
 	
@@ -894,15 +903,14 @@ public class Antharas extends DefaultNpc
 	@Override
 	public void onMyDying(Npc npc, Creature killer)
 	{
-		npc.broadcastPacket(new SpecialCamera(npc.getObjectId(), 1200, 20, -10, 0, 13000, 0, 0, 0, 0));
-		npc.broadcastPacket(new PlaySound(1, "BS01_D", npc));
-		
-		npc.getSpawn().getSpawnData().setDBValue(0);
+		if (npc.getSpawn().getSpawnData() != null)
+			npc.getSpawn().getSpawnData().setDBValue(0);
 		
 		int GM_ID = getNpcIntAIParam(npc, "GM_ID");
 		GlobalMemo.getInstance().remove(String.valueOf(GM_ID));
 		
 		addSpawn(31859, 177615, 114941, -7709, 0, false, 900000, true);
+		npc.deleteMe();
 	}
 	
 	private static void castAntharasSkill(Npc npc)

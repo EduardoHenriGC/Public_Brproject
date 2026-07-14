@@ -236,6 +236,16 @@ public class Valakas extends DefaultNpc
 		super("ai/boss/valakas");
 	}
 	
+	private boolean isFighting(Npc npc)
+	{
+		return npc.getSpawn().getSpawnData() == null || npc.getSpawn().getSpawnData().getDBValue() == 3;
+	}
+	
+	private boolean isSleeping(Npc npc)
+	{
+		return npc.getSpawn().getSpawnData() != null && npc.getSpawn().getSpawnData().getDBValue() == 0;
+	}
+	
 	public Valakas(String descr)
 	{
 		super(descr);
@@ -249,9 +259,9 @@ public class Valakas extends DefaultNpc
 	@Override
 	public void onNoDesire(Npc npc)
 	{
-		if (npc.getSpawn().getSpawnData().getDBValue() == 3)
+		if (isFighting(npc))
 			npc.getAI().addWanderDesire(5, 5);
-		else if (npc.getSpawn().getSpawnData().getDBValue() == 0)
+		else if (isSleeping(npc))
 			npc.removeAllDesire();
 	}
 	
@@ -262,9 +272,9 @@ public class Valakas extends DefaultNpc
 		if (i0 == -1)
 			GlobalMemo.getInstance().set(String.valueOf(GM_ID), npc.getObjectId());
 		
-		if (!npc.getSpawn().getDBLoaded())
+		if (!npc.getSpawn().getDBLoaded() && npc.getSpawn().getSpawnData() != null)
 			npc.getSpawn().getSpawnData().setDBValue(0);
-		else if (npc.getSpawn().getSpawnData().getDBValue() == 1)
+		else if (npc.getSpawn().getSpawnData() != null && npc.getSpawn().getSpawnData().getDBValue() == 1)
 			startQuestTimer("1001", npc, null, 600000);
 		
 		npc._i_ai0 = 0;
@@ -275,7 +285,7 @@ public class Valakas extends DefaultNpc
 		npc._i_quest0 = 0;
 		npc._i_quest1 = GameTimeTaskManager.getInstance().getCurrentTick();
 		
-		if (npc.getSpawn().getSpawnData().getDBValue() == 3)
+		if (isFighting(npc))
 		{
 			npc.getAI().addWanderDesire(5, 5);
 			
@@ -293,7 +303,7 @@ public class Valakas extends DefaultNpc
 		int i0 = 0;
 		int i1 = 0;
 		
-		if (npc.getSpawn().getSpawnData().getDBValue() == 0 && !npc.isDead() && attacker instanceof Player)
+		if (isSleeping(npc) && !npc.isDead() && attacker instanceof Player)
 			attacker.teleportTo(150037, -57255, -2976, 0);
 		
 		npc._i_quest1 = GameTimeTaskManager.getInstance().getCurrentTick();
@@ -687,7 +697,7 @@ public class Valakas extends DefaultNpc
 		
 		IntentionType currentIntentionType = npc.getAI().getCurrentIntention().getType();
 		
-		if (npc.getSpawn().getSpawnData().getDBValue() == 3 && (currentIntentionType == IntentionType.WANDER || currentIntentionType == IntentionType.IDLE))
+		if (isFighting(npc) && (currentIntentionType == IntentionType.WANDER || currentIntentionType == IntentionType.IDLE))
 		{
 			int i2 = 0;
 			Creature c2 = null;
@@ -768,7 +778,7 @@ public class Valakas extends DefaultNpc
 	@Override
 	public void onScriptEvent(Npc npc, int eventId, int arg1, int arg2)
 	{
-		if (npc.getSpawn().getSpawnData().getDBValue() == 0)
+		if (isSleeping(npc))
 		{
 			startQuestTimer("1001", npc, null, Config.WAIT_TIME_VALAKAS);
 			
@@ -793,11 +803,12 @@ public class Valakas extends DefaultNpc
 		}
 		else if (name.equalsIgnoreCase("1002"))
 		{
-			if (npc.getSpawn().getSpawnData().getDBValue() == 3)
+			if (isFighting(npc))
 			{
 				if (getElapsedTicks(npc._i_quest1) > (15 * 60))
 				{
-					npc.getSpawn().getSpawnData().setDBValue(0);
+					if (npc.getSpawn().getSpawnData() != null)
+						npc.getSpawn().getSpawnData().setDBValue(0);
 					npc.removeAllDesire();
 					npc.getSpawn().instantTeleportInMyTerritory(150037, -57255, -2976, 150);
 					npc.teleportTo(-105200, -253104, -15264, 0);
@@ -829,9 +840,9 @@ public class Valakas extends DefaultNpc
 		}
 		else if (name.equalsIgnoreCase("1003"))
 		{
-			IntentionType currentIntentionType = npc.getAI().getCurrentIntention().getType();
+			final IntentionType currentIntentionType = npc.getAI().getCurrentIntention().getType();
 			
-			if (npc.getSpawn().getSpawnData().getDBValue() == 3 && (currentIntentionType == IntentionType.WANDER || currentIntentionType == IntentionType.IDLE))
+			if (isFighting(npc) && (currentIntentionType == IntentionType.WANDER || currentIntentionType == IntentionType.IDLE))
 			{
 				int i1 = 0;
 				int i2 = 0;
@@ -958,7 +969,8 @@ public class Valakas extends DefaultNpc
 		else if (name.equalsIgnoreCase("1110"))
 		{
 			npc.getAI().addCastDesire(npc, 4691, 1, 4000000);
-			npc.getSpawn().getSpawnData().setDBValue(3);
+			if (npc.getSpawn() != null && npc.getSpawn().getSpawnData() != null)
+				npc.getSpawn().getSpawnData().setDBValue(3);
 			
 			startQuestTimer("1002", npc, player, 60000);
 			
@@ -1078,16 +1090,13 @@ public class Valakas extends DefaultNpc
 	@Override
 	public void onSeeCreature(Npc npc, Creature creature)
 	{
-		final Player player = creature.getActingPlayer();
-		if (player == null)
-			return;
-		
+		int i0 = 0;
 		int i1 = 0;
 		int i2 = 0;
 		
 		Creature c2 = null;
 		
-		if (npc.getSpawn().getSpawnData().getDBValue() == 3 && ClassId.isSameOccupation(player, "@cleric_group"))
+		if (creature instanceof Player player && isFighting(npc) && ClassId.isSameOccupation(player, "@cleric_group"))
 		{
 			final double hpRatio = npc.getStatus().getHpRatio();
 			if (hpRatio < 0.25)
@@ -1391,9 +1400,9 @@ public class Valakas extends DefaultNpc
 				break;
 		}
 		
-		IntentionType currentIntentionType = npc.getAI().getCurrentIntention().getType();
+		final IntentionType currentIntentionType = npc.getAI().getCurrentIntention().getType();
 		
-		if (npc.getSpawn().getSpawnData().getDBValue() == 3 && (currentIntentionType == IntentionType.WANDER || currentIntentionType == IntentionType.IDLE))
+		if (isFighting(npc) && (currentIntentionType == IntentionType.WANDER || currentIntentionType == IntentionType.IDLE))
 		{
 			if (npc._c_quest2 == null || npc.distance3D(npc._c_quest2) > 5000 || npc._c_quest2.isDead())
 				npc._i_quest2 = 0;
@@ -1531,11 +1540,10 @@ public class Valakas extends DefaultNpc
 	{
 		GlobalMemo.getInstance().remove(String.valueOf(GM_ID));
 		
-		npc.getSpawn().getSpawnData().setDBValue(0);
-		npc.broadcastPacket(new PlaySound(1, "B03_D", npc));
-		npc.broadcastPacket(new SpecialCamera(npc.getObjectId(), 2000, 130, -1, 0, 10000, 0, 0, 1, 1));
+		if (npc.getSpawn().getSpawnData() != null)
+			npc.getSpawn().getSpawnData().setDBValue(0);
 		
-		startQuestTimer("1111", npc, null, 500);
+		npc.deleteMe();
 	}
 	
 	private static void valakasCastSkills(Npc npc, Creature target, int chance1, int chance2, int chance3, int chance4, int chance5, int chance6, int chance7)
