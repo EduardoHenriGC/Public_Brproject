@@ -39,9 +39,16 @@ public class EpicBossEventManager extends Quest
 	
 	private static EpicBossEventManager _instance;
 	
+	private boolean _isEventRunning = false;
+	
 	public static EpicBossEventManager getInstance()
 	{
 		return _instance;
+	}
+	
+	public boolean isEventRunning()
+	{
+		return _isEventRunning;
 	}
 	
 	public EpicBossEventManager()
@@ -86,13 +93,24 @@ public class EpicBossEventManager extends Quest
 	public void startEvent()
 	{
 		LOGGER.info("EpicBossEventManager: Starting daily event.");
+		
+		// Clean up any remaining boss or tasks from yesterday before starting
+		cleanupEvent();
+		
+		_isEventRunning = true;
+		
+		for (ext.mods.gameserver.model.actor.Player player : World.getInstance().getPlayers())
+		{
+			if (player.isInsideZone(ext.mods.gameserver.enums.ZoneId.EPIC_EVENT))
+			{
+				player.updatePvPFlag(1);
+			}
+		}
+		
 		World.announceToOnlinePlayers("[Epic Boss Event] O evento comecou! O primeiro boss esta nascendo.");
 		
 		// Reschedule for tomorrow
 		scheduleNextDailyEvent();
-		
-		// Clean up any remaining boss or tasks from yesterday
-		cleanupEvent();
 		
 		// Generate random boss order
 		_bossOrder = new ArrayList<>(Arrays.asList(EPIC_BOSSES));
@@ -106,6 +124,16 @@ public class EpicBossEventManager extends Quest
 	
 	private void cleanupEvent()
 	{
+		_isEventRunning = false;
+		
+		for (ext.mods.gameserver.model.actor.Player player : World.getInstance().getPlayers())
+		{
+			if (player.isInsideZone(ext.mods.gameserver.enums.ZoneId.EPIC_EVENT))
+			{
+				player.updatePvPFlag(0);
+			}
+		}
+		
 		if (_nextBossSpawnTask != null)
 		{
 			_nextBossSpawnTask.cancel(false);
