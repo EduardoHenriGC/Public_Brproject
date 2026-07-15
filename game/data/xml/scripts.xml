@@ -948,6 +948,7 @@
 	<script path="script.ai.ssq.SsqPartyLeader" />
 	
 	<!-- Events -->
+	<script path="script.events.epicboss.EpicBossEventManager" />
 	
 	<!-- 	<script path="script.event.GiftOfVitality" /> -->
 	<script path="script.event.Christmas" />
