@@ -82,18 +82,6 @@ public final class PvpFlagTaskManager implements Runnable
 				}
 			}
 			
-			if (player.isInsideZone(ZoneId.EPIC_EVENT))
-			{
-				if (ext.mods.gameserver.scripting.script.events.epicboss.EpicBossEventManager.getInstance() != null && ext.mods.gameserver.scripting.script.events.epicboss.EpicBossEventManager.getInstance().isEventRunning())
-				{
-					if (player.getPvpFlag() == 0)
-					{
-						player.updatePvPFlag(1);
-					}
-					continue;
-				}
-			}
-			
 			if (player.isInTournament())
 				continue;
 			

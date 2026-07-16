@@ -179,13 +179,6 @@ public final class Config
 	public static int CS_SUPPORT3_FEE;
 	public static int CS_SUPPORT4_FEE;
 	
-	/** Epic Boss Event */
-	public static boolean EPIC_BOSS_EVENT_ENABLED;
-	public static int EPIC_BOSS_EVENT_HOUR;
-	public static int EPIC_BOSS_EVENT_MINUTE;
-	public static int EPIC_BOSS_DELAY_NEXT_BOSS;
-	public static int[] EPIC_BOSS_LOCATION;
-	
 	
 	/** Olympiad */
 	public static boolean OLY_ENABLED;
@@ -1538,15 +1531,6 @@ public final class Config
 	private static final void loadEvents()
 	{
 		final ExProperties events = initProperties(EVENTS_FILE);
-		
-		EPIC_BOSS_EVENT_ENABLED = events.getProperty("EnableEpicBossEvent", true);
-		EPIC_BOSS_EVENT_HOUR = events.getProperty("EpicBossEventHour", 20);
-		EPIC_BOSS_EVENT_MINUTE = events.getProperty("EpicBossEventMinute", 0);
-		EPIC_BOSS_DELAY_NEXT_BOSS = events.getProperty("EpicBossDelayNextBoss", 5);
-		
-		String locStr = events.getProperty("EpicBossLocation", "180137 75695 -13716");
-		String[] locSplit = locStr.split(" ");
-		EPIC_BOSS_LOCATION = new int[] { Integer.parseInt(locSplit[0]), Integer.parseInt(locSplit[1]), Integer.parseInt(locSplit[2]) };
 		
 		OLY_ENABLED = events.getProperty("OlympiadEnabled", true);
 		OLY_START_TIME = events.getProperty("OlyStartTime", 18);

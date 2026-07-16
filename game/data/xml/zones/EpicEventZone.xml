@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<list>
-	<!-- Epic Boss Event Zone -->
-	<zone shape="Cylinder" minZ="-5554" maxZ="-1554" rad="3000">
-		<node x="46310" y="183867"/>
-	</zone>
-</list>

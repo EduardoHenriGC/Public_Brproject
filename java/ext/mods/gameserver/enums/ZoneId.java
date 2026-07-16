@@ -43,8 +43,7 @@ public enum ZoneId
 	SSQ(21),
 	AUTO_FARM(22),
 	RANDOM(23),
-	COLISION(24),
-	EPIC_EVENT(25);
+	COLISION(24);
 	
 	private final int _id;
 	

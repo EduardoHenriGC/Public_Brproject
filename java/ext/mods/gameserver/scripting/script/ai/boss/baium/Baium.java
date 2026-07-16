@@ -44,11 +44,6 @@ public class Baium extends DefaultNpc
 		super("ai/boss/baium");
 	}
 	
-	private boolean isEventSpawn(Npc npc)
-	{
-		return npc.getSpawn().getSpawnData() == null;
-	}
-	
 	public Baium(String descr)
 	{
 		super(descr);
@@ -78,8 +73,7 @@ public class Baium extends DefaultNpc
 		npc.getPosition().setHeading(-25348);
 		npc.teleportTo(116033, 17447, 10107, 0);
 		
-		if (npc.getSpawn().getSpawnData() != null)
-			npc.getSpawn().getSpawnData().setDBValue(1);
+		npc.getSpawn().getSpawnData().setDBValue(1);
 		
 		npc._param1 = arg1;
 		
@@ -100,43 +94,26 @@ public class Baium extends DefaultNpc
 		npc._i_quest3 = 0;
 		
 		GlobalMemo.getInstance().set(GM_ID, npc.getObjectId());
+		npc.getSpawn().getSpawnData().setDBValue(0);
 		
-		if (!isEventSpawn(npc))
+		if (npc.isInMyTerritory())
 		{
-			npc.getSpawn().getSpawnData().setDBValue(0);
+			npc.getSpawn().getSpawnData().setDBValue(1);
 			
-			if (npc.isInMyTerritory())
-			{
-				npc.getSpawn().getSpawnData().setDBValue(1);
-				
-				npc._i_quest3 = 1;
-				npc._i_ai2 = GameTimeTaskManager.getInstance().getCurrentTick();
-				
-				startQuestTimer("2001", npc, null, 5000);
-				startQuestTimer("2002", npc, null, 60000);
-				startQuestTimer("2003", npc, null, ((Rnd.get(3) + 2) + (60 * 1000)));
-			}
-			else
-				createOnePrivateEx(npc, 29025, 116033, 17447, 10107, -25348, 0, false);
-			
-			npc._flag = 1;
-			npc._i_ai0 = 1;
-			npc._i_ai1 = 1;
-			npc._i_ai3 = 0;
-		}
-		else
-		{
 			npc._i_quest3 = 1;
-			npc._flag = 1;
 			npc._i_ai2 = GameTimeTaskManager.getInstance().getCurrentTick();
 			
+			startQuestTimer("2001", npc, null, 5000);
 			startQuestTimer("2002", npc, null, 60000);
 			startQuestTimer("2003", npc, null, ((Rnd.get(3) + 2) + (60 * 1000)));
-			
-			npc._i_ai0 = 1;
-			npc._i_ai1 = 1;
-			npc._i_ai3 = 1;
 		}
+		else
+			createOnePrivateEx(npc, 29025, 116033, 17447, 10107, -25348, 0, false);
+		
+		npc._flag = 1;
+		npc._i_ai0 = 1;
+		npc._i_ai1 = 1;
+		npc._i_ai3 = 0;
 	}
 	
 	@Override
@@ -144,8 +121,9 @@ public class Baium extends DefaultNpc
 	{
 		createOnePrivateEx(npc, 31842, 115017, 15549, 10090, 0, 0, false);
 		
+		npc.broadcastPacket(new PlaySound(1, "BS01_D", npc));
+		
 		GlobalMemo.getInstance().remove(GM_ID);
-		npc.deleteMe();
 	}
 	
 	@Override
@@ -835,11 +813,10 @@ public class Baium extends DefaultNpc
 		else if (name.equalsIgnoreCase("2002"))
 		{
 			final int i0 = getElapsedTicks(npc._i_ai2);
-			if (i0 > (30 * 60) && !isEventSpawn(npc))
+			if (i0 > (30 * 60))
 			{
 				npc.removeAllDesire();
-				if (npc.getSpawn().getSpawnData() != null)
-					npc.getSpawn().getSpawnData().setDBValue(0);
+				npc.getSpawn().getSpawnData().setDBValue(0);
 				npc.getSpawn().instantTeleportInMyTerritory(120112, 18208, -5152, 900);
 				npc.teleportTo(-105200, -253104, -15264, 0);
 				

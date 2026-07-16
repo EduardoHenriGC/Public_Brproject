@@ -27,6 +27,8 @@ import ext.mods.gameserver.model.actor.Playable;
 import ext.mods.gameserver.model.actor.Player;
 import ext.mods.gameserver.model.memo.GlobalMemo;
 import ext.mods.gameserver.model.spawn.NpcMaker;
+import ext.mods.gameserver.network.serverpackets.PlaySound;
+import ext.mods.gameserver.network.serverpackets.SpecialCamera;
 import ext.mods.gameserver.scripting.script.ai.individual.DefaultNpc;
 import ext.mods.gameserver.skills.L2Skill;
 import ext.mods.gameserver.taskmanager.GameTimeTaskManager;
@@ -51,19 +53,6 @@ public class FollowerOfFrintezzaTransform extends DefaultNpc
 		super(descr);
 	}
 	
-	private int getDBValue(Npc npc)
-	{
-		if (npc.getSpawn().getSpawnData() != null)
-			return npc.getSpawn().getSpawnData().getDBValue();
-		return 7;
-	}
-	
-	private void setDBValue(Npc npc, int value)
-	{
-		if (npc.getSpawn().getSpawnData() != null)
-			npc.getSpawn().getSpawnData().setDBValue(value);
-	}
-	
 	protected final int[] _npcIds =
 	{
 		29047
@@ -79,19 +68,19 @@ public class FollowerOfFrintezzaTransform extends DefaultNpc
 		
 		if (!npc.getSpawn().getDBLoaded())
 		{
-			setDBValue(npc, 0);
+			npc.getSpawn().getSpawnData().setDBValue(0);
 			
 			Npc c1 = (Npc) GlobalMemo.getInstance().getCreature("4");
 			if (c1 != null)
 				c1.sendScriptEvent(npc.getObjectId(), 0, 0);
 			
-			setDBValue(npc, 5);
+			npc.getSpawn().getSpawnData().setDBValue(5);
 			
 			c1 = (Npc) GlobalMemo.getInstance().getCreature("6");
 			if (c1 != null)
 				c1.sendScriptEvent(npc.getObjectId(), 0, 0);
 		}
-		else if (getDBValue(npc) == 7)
+		else if (npc.getSpawn().getSpawnData().getDBValue() == 7)
 		{
 			c0 = (Npc) GlobalMemo.getInstance().getCreature("4");
 			
@@ -367,7 +356,7 @@ public class FollowerOfFrintezzaTransform extends DefaultNpc
 		}
 		else if (arg1 == 0)
 		{
-			setDBValue(npc, 0);
+			npc.getSpawn().getSpawnData().setDBValue(0);
 			npc.removeAllDesire();
 			npc._i_quest2 = 0;
 			npc._i_quest3 = 0;
@@ -430,8 +419,20 @@ public class FollowerOfFrintezzaTransform extends DefaultNpc
 			
 			startQuestTimer("3000", npc, null, 60000);
 		}
+		else if (name.equalsIgnoreCase("2000"))
+		{
+			npc.broadcastPacket(new SpecialCamera(npc.getObjectId(), 430, 300, 80, 0, 10000, 0, 0, 1, 1));
+			startQuestTimer("2001", npc, null, 100);
+		}
+		else if (name.equalsIgnoreCase("2001"))
+		{
+			npc.broadcastPacket(new PlaySound(1, "BS05_D", npc));
+			npc.broadcastPacket(new SpecialCamera(npc.getObjectId(), 430, 300, 80, 0, 10000, 0, 0, 1, 1));
+			startQuestTimer("2002", npc, null, 400);
+		}
 		else if (name.equalsIgnoreCase("2002"))
 		{
+			npc.broadcastPacket(new SpecialCamera(npc.getObjectId(), 0, 180, 80, 4000, 6000, 0, 0, 1, 1));
 			startQuestTimer("2003", npc, null, 6000);
 		}
 		else if (name.equalsIgnoreCase("3000"))
@@ -440,7 +441,7 @@ public class FollowerOfFrintezzaTransform extends DefaultNpc
 			{
 				if (getElapsedTicks(npc._i_quest1) > (15 * 60))
 				{
-					setDBValue(npc, 0);
+					npc.getSpawn().getSpawnData().setDBValue(0);
 					
 					Npc c0 = (Npc) GlobalMemo.getInstance().getCreature("4");
 					
